@@ -1,0 +1,18 @@
+.col-md-8 
+{
+    margin-bottom: -6px;
+}
+.panel-default {
+    border-color: #c9b4b4;
+}
+.panel {
+    margin-bottom: 20px;
+    background-color: white !important;
+}
+.form-control {
+    border: 1px solid orange;
+    margin-left: -20px !important;
+}
+.control-label{
+    font-size: 13px;
+}
