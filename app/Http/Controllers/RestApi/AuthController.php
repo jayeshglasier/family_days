@@ -19,16 +19,6 @@ use Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * User Registration
-     *
-     * @param  [string] name
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [string] password_confirmation
-     * @return [string] message
-     */
-
     public function signUp(Request $request)
     {
         $dataObject = (object) [];
@@ -116,7 +106,6 @@ class AuthController extends Controller
                 $insertData->password = bcrypt($request->password);
                 $insertData->use_token = str_random(90);
                 $insertData->remember_token = str_random(90);
-                $insertData->use_fcm_token = $request->device_token;
                 if($request->birth_date)
                 {
                     $birthDate = date('Y-m-d', strtotime(str_replace('/', '-', $request['birth_date'])));
@@ -132,6 +121,8 @@ class AuthController extends Controller
                 $insertData->use_image = $imagesname;
                 $insertData->use_total_member = 1;
                 $insertData->use_total_point = 0;
+                $insertData->use_fcm_token = $request->device_token ? $request->device_token:'';
+                $insertData->use_device_type = $request->device_type ? $reques->device_type:0;
                 $insertData->created_at = date('Y-m-d H:i:s');
                 $insertData->updated_at = date('Y-m-d H:i:s');
                 $insertData->email_verified_at = date('Y-m-d H:i:s');
@@ -156,21 +147,26 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Login user and create token
-     *
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [boolean] remember_me
-     * @return [string] access_token
-     * @return [string] token_type
-     * @return [string] expires_at
-     */
-
     public function signIn(Request $request)
     {
         try
         {
+            $rules = [
+                'username'  => 'required',
+                'password'  => 'required',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails())
+            {
+                $errors = $validator->errors();
+                $emptyObject = (object) [];
+                foreach ($errors->all() as $message) {                
+                   return response()->json(['success' => false, 'error' => 401, 'message' => $message]);
+                }
+            }
+
             $username = $request->username;
             $password = $request->password;
             $user = User::select('email','password','use_token as token')->where('email','=',$username)->orwhere('use_username',$request->username)->first();
@@ -192,6 +188,7 @@ class AuthController extends Controller
                         }
                         
                         $update_req['use_fcm_token'] = $request['device_token'];
+                        $update_req['use_device_type'] = $request['device_type'] ? $request['device_type']:0;
                         $update = User::where('use_username',$userDetail->use_username)->update($update_req);
 
                         if($userDetail->use_image)
@@ -249,14 +246,6 @@ class AuthController extends Controller
             Exceptions::exception($e);
         }
     }
-
-    /**
-     * User can change it password api
-     *
-     * @param  [string] email
-     * @param  [string] password
-     * @return [string] updateed user details
-     */
 
     public function updatePassword(Request $request)
     {
@@ -329,14 +318,6 @@ class AuthController extends Controller
             }
         }
     }
-
-    /**
-     * Reset / Forget Password Api
-     *
-     * @param  [string] email
-     * @param  [string] password
-     * @return [string] updated user details
-     */
 
     public function ForgetPassword(Request $request)
     {

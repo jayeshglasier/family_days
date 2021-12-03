@@ -90,7 +90,7 @@ class SendDailyNotification extends Command
         $choresone = $one->format('Y-m-d H:i:s');
 
         // -------------------- Begin Send notification remaining 24 hours (Chores) --------------------
-        $recordtwentyFour = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$chorestwentyThree,$chorestwentyFour])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+        $recordtwentyFour = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token','use_device_type')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$chorestwentyThree,$chorestwentyFour])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
         if(!$recordtwentyFour->isEmpty())
         {
@@ -105,7 +105,7 @@ class SendDailyNotification extends Command
                     $updateReq['sno_is_twenty_four'] = 1;
                     $update = StatusNotification::where('sno_chores_id',$value->cho_id)->update($updateReq);
 
-                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId);
+                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId,$value['use_device_type']);
                 }
             
             }
@@ -114,7 +114,7 @@ class SendDailyNotification extends Command
         // -------------------- End Send notification remaining 24 hours (Chores) --------------------
 
 
-        $recordtwelve = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$chorestwelve,$choresfourteen])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+        $recordtwelve = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token','use_device_type')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$chorestwelve,$choresfourteen])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
         if(!$recordtwelve->isEmpty())
         {
@@ -128,13 +128,13 @@ class SendDailyNotification extends Command
                 }else{
                     $updateReq['sno_is_twelve'] = 1;
                     $update = StatusNotification::where('sno_chores_id',$value->cho_id)->update($updateReq);
-                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId);
+                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId,$value['use_device_type']);
                 }
             
             }
         }
 
-        $recordsix = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresfive,$choresSeven])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+        $recordsix = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token','use_device_type')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresfive,$choresSeven])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
         if(!$recordsix->isEmpty())
         {
@@ -149,12 +149,12 @@ class SendDailyNotification extends Command
                     $updateReq['sno_is_six'] = 1;
                     $update = StatusNotification::where('sno_chores_id',$value->cho_id)->update($updateReq);
 
-                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId);
+                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId,$value['use_device_type']);
                 }
             }
         }
 
-        $recordThree = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresTwo,$choresfour])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+        $recordThree = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token','use_device_type')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresTwo,$choresfour])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
         if(!$recordThree->isEmpty())
         {
@@ -169,13 +169,13 @@ class SendDailyNotification extends Command
                     $updateReq['sno_is_three'] = 1;
                     $update = StatusNotification::where('sno_chores_id',$value->cho_id)->update($updateReq);
 
-                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId);
+                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId,$value['use_device_type']);
                 }
             
             }
         }
 
-        $recordOne = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresone,$choresTwo])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+        $recordOne = Chores::select('cho_id','cho_title','cho_set_time','use_username','id as used_id','use_fcm_token','use_device_type')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->whereBetween('cho_set_time',[$choresone,$choresTwo])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
         if(!$recordOne->isEmpty())
         {
@@ -190,46 +190,75 @@ class SendDailyNotification extends Command
                     $updateReq['sno_is_one'] = 1;
                     $update = StatusNotification::where('sno_chores_id',$value->cho_id)->update($updateReq);
 
-                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId);
+                    $this->notification($value['use_fcm_token'],$value->cho_title,$content,$type,$notificationId,$value['use_device_type']);
                 }
             }
         }
     }
 
-    public function notification($token, $choreName,$content,$type,$notificationId)
+    public function notification($token, $choreName,$content,$type,$notificationId,$deviceType)
     {
         $url = 'https://fcm.googleapis.com/fcm/send';
         $token = $token;
 
-        $notification = array(
-            'body' => $choreName,
-            'title' => $choreName.' '. $content.' - Family Days',
-            'sound' => "default",
-            'color' => "#203E78",
-            'type' => $type,
-            'notification_id' => $notificationId,
-            'mutable-content' => 1
-        );
+        $fcmNotification = array();
 
-        $fcmNotification = array(
-            'registration_ids' => array($token),
-            'priority' => 'high',
-            'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-            'type' => $type,
-            'mutable-content' => 1,
-            'headers' => array( 'apns-priority' => '10'),
-            'content_available' => true,
-            'notification'=> $notification,
-            'data' => array(
-                "date" => date('d-m-Y H:i:s'),
-                "message" => $choreName,
-                "type" => $type,
-                'vibrate' => 1,
-                'sound' => 1,
+        if($deviceType == 1) // iOs
+        {
+
+            $notification = array(
+                'body' => $choreName,
+                'title' => $choreName.' '. $content.' - Family Days',
+                'sound' => "default",
+                'color' => "#203E78",
+                'type' => $type,
                 'notification_id' => $notificationId,
                 'mutable-content' => 1
-            )
-        );
+            );
+
+            $fcmNotification = array(
+                'registration_ids' => array($token),
+                'priority' => 'high',
+                'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
+                'type' => $type,
+                'mutable-content' => 1,
+                'headers' => array( 'apns-priority' => '10'),
+                'content_available' => true,
+                'notification'=> $notification,
+                'data' => array(
+                    "date" => date('d-m-Y H:i:s'),
+                    "message" => $choreName,
+                    "type" => $type,
+                    'vibrate' => 1,
+                    'sound' => 1,
+                    'notification_id' => $notificationId,
+                    'mutable-content' => 1
+                )
+            );
+        }
+
+        if($deviceType == 2) // Andriod
+        {
+            $notification = [
+                'date'      => date('d-m-Y H:i:s'),
+                'title'     => $choreName.' '. $content.' - Family Days',
+                'body'      => $choreName,
+                'sound'     => "default",
+                'color'     => "#203E78",
+                'type'      => $type,
+                'message'   => $choreName,
+                'vibrate'   => 1,
+                'badge'     => 1,
+                'notification_id' => $notificationId
+              ];
+              
+              $extraNotificationData = $notification;
+
+              $fcmNotification = [
+                  'to'   => $token,
+                  'data' => $extraNotificationData
+              ];
+        }
 
         $fcmNotification = json_encode ( $fcmNotification );
 

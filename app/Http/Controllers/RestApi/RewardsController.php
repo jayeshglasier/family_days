@@ -226,7 +226,7 @@ class RewardsController extends Controller
                                 $arrayToken = array();
 
                                     foreach ($childId as $key => $tokenValue) {
-                                        $getToken = User::select('use_username','use_fcm_token')->where('id',$tokenValue)->first();
+                                        $getToken = User::select('use_username','use_fcm_token','use_device_type')->where('id',$tokenValue)->first();
 
                                         foreach ($familyDetails as $key => $value) 
                                         {
@@ -253,10 +253,9 @@ class RewardsController extends Controller
 
                                                 if($getToken)
                                                 {
-
                                                     $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$value->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
-                                                    $this->notification($value->use_fcm_token,$rewardDetails['red_rewards_name'],$notification['rewardByParentContent'],$notification['rewardByParentType'],$getToken['use_username'],$notificationId,$notificationCount);
+                                                    $this->notification($value->use_fcm_token,$rewardDetails['red_rewards_name'],$notification['rewardByParentContent'],$notification['rewardByParentType'],$getToken['use_username'],$notificationId,$notificationCount,$getToken['use_device_type']);
                                                 }
                                             }
                                         }
@@ -292,41 +291,68 @@ class RewardsController extends Controller
         }
     }
 
-    public function notification($token, $rewardName,$rewardByChildContent,$rewardByChildType,$use_username,$notificationId,$notificationCount)
+    public function notification($token, $rewardName,$rewardByChildContent,$rewardByChildType,$use_username,$notificationId,$notificationCount,$deviceType)
     {
         $url = 'https://fcm.googleapis.com/fcm/send';
         $token = $token;
 
-        $notification = array(
-            'body' => $rewardName,
-            'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
-            'sound' => "default",
-            'color' => "#203E78",
-            'type' => $rewardByChildType,
-            'notification_id' => $notificationId,
-            'badge' => $notificationCount
-        );
+        $fcmNotification = array();
 
-        $fcmNotification = array(
-            'registration_ids' => array($token),
-            'priority' => 'high',
-            'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-            'type' => $rewardByChildType,
-            'badge' => $notificationCount,
-
-            'headers' => array( 'apns-priority' => '10'),
-            'content_available' => true,
-            'notification'=> $notification,
-            'data' => array(
-                'date' => date('d-m-Y H:i:s'),
-                'message' => $rewardName,
+        if($deviceType == 1) // iOs
+        {
+            $notification = array(
+                'body' => $rewardName,
+                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'sound' => "default",
+                'color' => "#203E78",
                 'type' => $rewardByChildType,
-                'vibrate' => 1,
-                'sound' => 1,
                 'notification_id' => $notificationId,
                 'badge' => $notificationCount
-            )
-        );
+            );
+
+            $fcmNotification = array(
+                'registration_ids' => array($token),
+                'priority' => 'high',
+                'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
+                'type' => $rewardByChildType,
+                'badge' => $notificationCount,
+
+                'headers' => array( 'apns-priority' => '10'),
+                'content_available' => true,
+                'notification'=> $notification,
+                'data' => array(
+                    'date' => date('d-m-Y H:i:s'),
+                    'message' => $rewardName,
+                    'type' => $rewardByChildType,
+                    'vibrate' => 1,
+                    'sound' => 1,
+                    'notification_id' => $notificationId,
+                    'badge' => $notificationCount
+                )
+            );
+        }
+
+        if($deviceType == 2) // Andriod
+        {
+            $notification = [
+                'date'      => date('d-m-Y H:i:s'),
+                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'body'      => $rewardName,
+                'sound'     => "default",
+                'color'     => "#203E78",
+                'type'      => $rewardByChildType,
+                'message'   => $rewardName,
+                'vibrate'   => 1,
+                'badge'     => $notificationCount,
+              ];
+              
+              $extraNotificationData = $notification;
+
+              $fcmNotification = [
+                  'to'   => $token,
+                  'data' => $extraNotificationData
+              ];
+        }
 
         $fcmNotification = json_encode ( $fcmNotification );
 
@@ -514,7 +540,7 @@ class RewardsController extends Controller
                                 $parentUsername = 'Parents';
                             }
                             
-                            $childDetails = User::select('id as user_id','use_fcm_token','use_username')->where('id',$rewardDetails->red_child_id)->get();
+                            $childDetails = User::select('id as user_id','use_fcm_token','use_username','use_device_type')->where('id',$rewardDetails->red_child_id)->get();
 
                             if($childDetails)
                             {
@@ -542,7 +568,7 @@ class RewardsController extends Controller
                                 $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$value->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
                                 $notificationId = $insertMessage->not_id;
-                                $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$parentUsername,$notificationId,$notificationCount);
+                                $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$parentUsername,$notificationId,$notificationCount,$value->use_device_type);
                                 }
                             }
                         }
@@ -698,7 +724,7 @@ class RewardsController extends Controller
 
                                     $rewardDetails = Rewards::select('red_id','red_point','red_rewards_name','red_child_id')->where('red_id',$request->reward_id)->first(); 
 
-                                    $parentsDetails = User::select('id as user_id','use_fcm_token')->where('id',$rewardDetails->red_child_id)->get();
+                                    $parentsDetails = User::select('id as user_id','use_fcm_token','use_device_type')->where('id',$rewardDetails->red_child_id)->get();
 
                                     foreach ($parentsDetails as $value) {
 
@@ -724,12 +750,12 @@ class RewardsController extends Controller
                                         $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$value->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
                                         $notificationId = $insertMessage->not_id;
-                                        $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$userRecord->use_username,$notificationId,$notificationCount);
+                                        $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$userRecord->use_username,$notificationId,$notificationCount,$value->use_device_type);
                                     }
 
                                 }else{
 
-                                    $parentsDetails = User::select('id as user_id','use_fcm_token')->whereIn('use_role',[2,3])->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->get();
+                                    $parentsDetails = User::select('id as user_id','use_fcm_token','use_device_type')->whereIn('use_role',[2,3])->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->get();
 
                                     $rewardDetails = Rewards::select('red_id','red_point','red_rewards_name')->where('red_id',$request->reward_id)->first();
 
@@ -757,7 +783,7 @@ class RewardsController extends Controller
                                         $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$value->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
                                         $notificationId = $insertMessage->not_id;
-                                        $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$userRecord->use_username,$notificationId,$notificationCount);
+                                        $this->notiChildRewardEdit($value->use_fcm_token,$rewardDetails['red_rewards_name'],$rewardByChildContent,$rewardByChildType,$userRecord->use_username,$notificationId,$notificationCount,$value->use_device_type);
                                     }
                                 }
                                  $msg = "Reward Updated Successfully!";
@@ -788,41 +814,69 @@ class RewardsController extends Controller
         }
     }
 
-    public function notiChildRewardEdit($token, $rewardName,$rewardByChildContent,$rewardByChildType,$use_username,$notificationId,$notificationCount)
+    public function notiChildRewardEdit($token, $rewardName,$rewardByChildContent,$rewardByChildType,$use_username,$notificationId,$notificationCount,$deviceType)
     {
         $url = 'https://fcm.googleapis.com/fcm/send';
         $token = $token;
 
-        $notification = array(
-            'body' => $rewardName,
-            'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
-            'sound' => "default",
-            'color' => "#203E78",
-            'type' => $rewardByChildType,
-            'notification_id' => $notificationId,
-            'badge' => $notificationCount
-        );
+        $fcmNotification = array();
 
-        $fcmNotification = array(
-            'registration_ids' => array($token),
-            'priority' => 'high',
-            'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-            'type' => $rewardByChildType,
-            'badge' => $notificationCount,
+        if($deviceType == 1) // iOs
+        {
 
-            'headers' => array( 'apns-priority' => '10'),
-            'content_available' => true,
-            'notification'=> $notification,
-            'data' => array(
-                'date' => date('d-m-Y H:i:s'),
-                'message' => $rewardName,
+            $notification = array(
+                'body' => $rewardName,
+                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'sound' => "default",
+                'color' => "#203E78",
                 'type' => $rewardByChildType,
-                'vibrate' => 1,
-                'sound' => 1,
                 'notification_id' => $notificationId,
                 'badge' => $notificationCount
-            )
-        );
+            );
+
+            $fcmNotification = array(
+                'registration_ids' => array($token),
+                'priority' => 'high',
+                'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
+                'type' => $rewardByChildType,
+                'badge' => $notificationCount,
+
+                'headers' => array( 'apns-priority' => '10'),
+                'content_available' => true,
+                'notification'=> $notification,
+                'data' => array(
+                    'date' => date('d-m-Y H:i:s'),
+                    'message' => $rewardName,
+                    'type' => $rewardByChildType,
+                    'vibrate' => 1,
+                    'sound' => 1,
+                    'notification_id' => $notificationId,
+                    'badge' => $notificationCount
+                )
+            );
+        }
+
+        if($deviceType == 2) // Andriod
+        {
+            $notification = [
+                'date'      => date('d-m-Y H:i:s'),
+                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'body'      => $rewardName,
+                'sound'     => "default",
+                'color'     => "#203E78",
+                'type'      => $rewardByChildType,
+                'message'   => $rewardName,
+                'vibrate'   => 1,
+                'badge'     => $notificationCount,
+              ];
+              
+              $extraNotificationData = $notification;
+
+              $fcmNotification = [
+                  'to'   => $token,
+                  'data' => $extraNotificationData
+              ];
+        }
 
         $fcmNotification = json_encode ( $fcmNotification );
 

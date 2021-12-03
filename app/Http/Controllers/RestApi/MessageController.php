@@ -7,6 +7,7 @@ use Validator;
 use Illuminate\Http\Request;
 use App\Helper\ResponseMessage;
 use App\Helper\NotificationKey;
+use App\Helper\MobileNotification;
 use App\Helper\Exceptions;
 use App\Mail\UserRegistered;
 use App\Model\Notification;
@@ -20,10 +21,6 @@ use DB;
 
 class MessageController extends Controller
 {
-    /**
-     * Return all users except the existing one
-     * 
-     */
 
     public function familymemberList(Request $request,$unRead = 0)
     {
@@ -44,7 +41,7 @@ class MessageController extends Controller
                         $update = Notification::where('not_id',$notificationId)->update($updataData);
 
                         if($usertDetail)
-                        {
+                        {   
                             if($usertDetail->use_role == 2)
                             {
                                 $userRole = "Father";
@@ -135,7 +132,7 @@ class MessageController extends Controller
 
                         }else{
                         $message = "Family member list";
-                        return json_encode(['status' => true, 'error' => 200, 'message' => $message,'user_info' => array(), 'data'=> array()],JSON_UNESCAPED_SLASHES);
+                        return json_encode(['status' => true, 'error' => 200, 'message' => $message,'user_info' => $userInformation, 'data'=> array()],JSON_UNESCAPED_SLASHES);
                     }
                     }else
                     {
@@ -221,61 +218,28 @@ class MessageController extends Controller
                             $insert->save();
                         }
 
-                        $userReceived = DB::table('users')->select('id as user_id','use_fcm_token')->where('id',$request['received_id'])->first();
+                        $userReceived = DB::table('users')->select('id as user_id','use_fcm_token','use_device_type')->where('id',$request['received_id'])->first();
 
                         if($userReceived)
-                        {
-                            $insertMessage = new Notification;
-                            $insertMessage->not_child_name = $userRecord->use_username;
-                            $insertMessage->not_type = $notification['sendMessageType'];
-                            $insertMessage->not_content = $notification['sendMessageContent'];
-                            $insertMessage->not_sender_id = $senderId;
-                            $insertMessage->not_received_id = $request['received_id'];
-                            $insertMessage->not_chores_id = '';
-                            $insertMessage->not_reward_id = '';
-                            $insertMessage->not_claim_id = '';
-                            $insertMessage->not_message_id = $insertData->cha_id;
-                            $insertMessage->not_data = $request['message'];
-                            $insertMessage->not_is_read = 0; // 0 = No Read 1 = Yes Read
-                            $insertMessage->not_read_at = date('Y-m-d H:i:s');
-                            $insertMessage->not_createdat = date('Y-m-d H:i:s');
-                            $insertMessage->not_updatedat = date('Y-m-d H:i:s');
-                            $insertMessage->save();
+                        {   
+                            $notCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$request['received_id'])->where('not_new_notification',0)->count('not_new_notification');
 
-                            $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$request['received_id'])->where('not_new_notification',0)->count('not_new_notification');
+                            $title = $userRecord->use_username. ' '.$notification['sendMessageContent'].' - Family Days';
+                            $userName = $userRecord->use_username;
+                            $sendMessageType = $notification['sendMessageType'];
+                            $sendMessageContent = $notification['sendMessageContent'];
+                            $senderId = $senderId;
+                            $receivedId = $request['received_id'];
+                            $choresId = '';
+                            $rewardId = '';
+                            $claimId  = '';
+                            $messageId = $insertData->cha_id;
+                            $message = $request['message'];
+                            $deviceToken = $userReceived->use_fcm_token;
+                            $deviceType = $userReceived->use_device_type;
+                            $notificationCount = $notCount;
 
-                            $notificationMessage = array(
-                                'body' => $request['message'],
-                                'title' => $userRecord->use_username. ' '.$notification['sendMessageContent'].' - Family Days',
-                                'sound' => "default",
-                                'color' => "#203E78",
-                                'type' => $notification['sendMessageType'],
-                                'notification_id' => $insertMessage->not_id,
-                                'badge' => $notificationCount
-                            );
-
-                            $fields = array(
-                                'registration_ids' => array($userReceived->use_fcm_token),
-                                'priority' => 'high',
-                                'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-                                'type' => $notification['sendMessageType'],
-                                'badge' => $notificationCount,
-
-                                'headers' => array( 'apns-priority' => '10'),
-                                'content_available' => true,
-                                'notification'=> $notificationMessage,
-                                'data' => array(
-                                    'date' => date('d-m-Y H:i:s'),
-                                    'message' => $request['message'],
-                                    'type' => $notification['sendMessageType'],
-                                    'vibrate' => 1,
-                                    'sound' => 1,
-                                    'notification_id' => $insertMessage->not_id,
-                                    'badge' => $notificationCount
-                                )
-                            );
-
-                            NotificationKey::notificationCurl($fields);
+                            MobileNotification::sendNotification($title,$userName,$sendMessageType,$sendMessageContent,$senderId,$receivedId,$choresId,$rewardId,$claimId,$messageId,$message,$deviceToken,$deviceType,$notificationCount);
                         }
                         ResponseMessage::successMessage("Message send successfully!");
                         }

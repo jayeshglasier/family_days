@@ -112,7 +112,6 @@ class UserController extends Controller
                 {
                     if(User::where('use_token',$header)->where('use_status',0)->exists())
                     {
-
                         $rules = [
                             'profile_file' => 'required|mimes:jpeg,png,jpg|max:5024',
                             ];

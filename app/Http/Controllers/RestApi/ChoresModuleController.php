@@ -26,8 +26,7 @@ use Carbon\CarbonPeriod;
 
 class ChoresModuleController extends Controller
 {  
-    /// Admin create chore api
-
+    // Admin create chore api
     public function createChore(Request $request,$notificationId = 0)
     {
         $header = $request->header('token');
@@ -210,7 +209,7 @@ class ChoresModuleController extends Controller
 
                                         $childDetails = User::select('id as child_id','use_username','use_full_name')->where('id',$value)->first();
 
-                                        $getFamilyDetails = User::select('id as user_id','use_fcm_token')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
+                                        $getFamilyDetails = User::select('id as user_id','use_fcm_token','use_device_type')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
 
                                             $arrayToken = array();
                                             foreach ($getFamilyDetails as $key => $tokenValue) {
@@ -239,7 +238,7 @@ class ChoresModuleController extends Controller
                                                     {
                                                         $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$tokenValue->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
-                                                        $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByParentContent'],$notification['choreByParentType'],$childDetails->use_username,$notificationId,$notificationCount);
+                                                        $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByParentContent'],$notification['choreByParentType'],$childDetails->use_username,$notificationId,$notificationCount,$tokenValue['use_device_type']);
                                                     }
                                                 }
                                                
@@ -265,13 +264,13 @@ class ChoresModuleController extends Controller
                                     
                                     $notificationId = $insertMessage->not_id;
                                     
-                                    $getToken = User::select('use_fcm_token','use_username')->where('id',$value)->first();
+                                    $getToken = User::select('use_fcm_token','use_username','use_device_type')->where('id',$value)->first();
 
                                     if($getToken)
                                     {
                                         $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$value)->where('not_new_notification',0)->count('not_new_notification');
 
-                                        $this->notification($getToken['use_fcm_token'],$request->title,$notification['choreByParentContent'],$notification['choreByParentType'],$getToken['use_username'],$notificationId,$notificationCount);
+                                        $this->notification($getToken['use_fcm_token'],$request->title,$notification['choreByParentContent'],$notification['choreByParentType'],$getToken['use_username'],$notificationId,$notificationCount,$getToken['use_device_type']);
                                     }
 
                                 }
@@ -329,12 +328,16 @@ class ChoresModuleController extends Controller
         }
     }
 
-    public function notification($token, $choreName,$content,$type,$use_username,$notificationId,$notificationCount)
+    public function notification($token, $choreName,$content,$type,$use_username,$notificationId,$notificationCount,$deviceType)
     {
         $url = 'https://fcm.googleapis.com/fcm/send';
         $token = $token;
 
-        $notification = array(
+        $fcmNotification = array();
+
+        if($deviceType == 1) // iOs
+        {
+            $notification = array(
             'body' => $choreName,
             'title' => $choreName. ' '.$content.' '. $use_username.' - Family Days',
             'sound' => "default",
@@ -342,28 +345,51 @@ class ChoresModuleController extends Controller
             'type' => $type,
             'notification_id' => $notificationId,
             'badge' => $notificationCount
-        );
+            );
 
-        $fcmNotification = array(
-            'registration_ids' => array($token),
-            'priority' => 'high',
-            'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-            'type' => $type,
-            'badge' => $notificationCount,
+            $fcmNotification = array(
+                'registration_ids' => array($token),
+                'priority' => 'high',
+                'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
+                'type' => $type,
+                'badge' => $notificationCount,
 
-            'headers' => array( 'apns-priority' => '10'),
-            'content_available' => true,
-            'notification'=> $notification,
-            'data' => array(
-                "date" => date('d-m-Y H:i:s'),
-                "message" => $choreName,
-                "type" => $type,
-                'vibrate' => 1,
-                'sound' => 1,
-                'notification_id' => $notificationId,
-                'badge' => $notificationCount
-            )
-        );
+                'headers' => array( 'apns-priority' => '10'),
+                'content_available' => true,
+                'notification'=> $notification,
+                'data' => array(
+                    "date" => date('d-m-Y H:i:s'),
+                    "message" => $choreName,
+                    "type" => $type,
+                    'vibrate' => 1,
+                    'sound' => 1,
+                    'notification_id' => $notificationId,
+                    'badge' => $notificationCount
+                )
+            );    
+        }
+
+        if($deviceType == 2) // Andriod
+        {
+            $notification = [
+                'date'      => date('d-m-Y H:i:s'),
+                'title'     => $choreName. ' '.$content.' '. $use_username.' - Family Days',
+                'body'      => $choreName,
+                'sound'     => "default",
+                'color'     => "#203E78",
+                'type'      => $type,
+                'message'   => $choreName,
+                'vibrate'   => 1,
+                'badge'     => $notificationCount,
+              ];
+              
+              $extraNotificationData = $notification;
+
+              $fcmNotification = [
+                  'to'   => $token,
+                  'data' => $extraNotificationData
+              ];
+        }
 
         $fcmNotification = json_encode ( $fcmNotification );
 
@@ -468,7 +494,7 @@ class ChoresModuleController extends Controller
                                         if($l <= 1)
                                         {
                                             $notificationId = 0;
-                                            $getToken = User::select('use_fcm_token','id as user_id','use_username')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
+                                            $getToken = User::select('use_fcm_token','id as user_id','use_username','use_device_type')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
                                            
                                                 foreach ($getToken as $key => $tokenValue) {
                                                 $insertMessage = new Notification;
@@ -492,7 +518,7 @@ class ChoresModuleController extends Controller
 
                                                 $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$tokenValue->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
-                                                $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByChildContent'],$notification['choreByChildType'],$userRecord->use_username,$notificationId,$notificationId);
+                                                $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByChildContent'],$notification['choreByChildType'],$userRecord->use_username,$notificationId,$notificationId,$tokenValue['use_device_type']);
                                             }
                                         }
                                     }
@@ -550,7 +576,7 @@ class ChoresModuleController extends Controller
                                 if($userRecord)
                                 {
                                     $notificationId = 0;
-                                    $getToken = User::select('use_fcm_token','id as user_id')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
+                                    $getToken = User::select('use_fcm_token','id as user_id','use_device_type')->where('use_fam_unique_id',$userRecord->use_fam_unique_id)->whereIn('use_role',[2,3])->get();
                                    
                                         foreach ($getToken as $key => $tokenValue) {
                                             $insertMessage = new Notification;
@@ -574,7 +600,7 @@ class ChoresModuleController extends Controller
 
                                         $notificationCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$tokenValue->user_id)->where('not_new_notification',0)->count('not_new_notification');
 
-                                        $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByChildContent'],$notification['choreByChildType'],$userRecord->use_username,$notificationId,$notificationCount);
+                                        $this->notification($tokenValue['use_fcm_token'],$request->title,$notification['choreByChildContent'],$notification['choreByChildType'],$userRecord->use_username,$notificationId,$notificationCount,$tokenValue['use_device_type']);
                                     }
                                 }
 

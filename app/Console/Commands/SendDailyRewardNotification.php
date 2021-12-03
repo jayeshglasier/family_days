@@ -51,52 +51,82 @@ class SendDailyRewardNotification extends Command
         $tomorrowDate = $tomorrow_date->format('Y-m-d');
         $notificationId = 0;
 
-        $recordReward = Rewards::select('id as user_id','red_id','red_rewards_name','use_fcm_token')->join('users','tbl_rewards.red_child_id','=','users.id')->whereBetween('red_frame_date', [$current_date,$tomorrowDate])->where('red_status',0)->orderby('red_frame_date','ASC')->get();
+        $recordReward = Rewards::select('id as user_id','red_id','red_rewards_name','use_fcm_token','use_device_type')->join('users','tbl_rewards.red_child_id','=','users.id')->whereBetween('red_frame_date', [$current_date,$tomorrowDate])->where('red_status',0)->orderby('red_frame_date','ASC')->get();
 
         if(!$recordReward->isEmpty())
         {
             $content = "Reward expiring in 24 Hours";
             $type = "twenty_four_hours_remaining_reward";
             foreach ($recordReward as $key => $value) {
-                $this->notification($value['use_fcm_token'],$value->red_rewards_name,$content,$type,$notificationId);
+                $this->notification($value['use_fcm_token'],$value->red_rewards_name,$content,$type,$notificationId,$value['use_device_type']);
             }
         }
 
         // -------------------- End Send notification remaining 24 hours (Chores) -------------------
     }
 
-    public function notification($token, $rewardName,$content,$type,$notificationId)
+    public function notification($token, $rewardName,$content,$type,$notificationId,$deviceType)
     {
         $url = 'https://fcm.googleapis.com/fcm/send';
         $token = $token;
 
-        $notification = array(
-            'body' => $rewardName,
-            'title' => $rewardName.' '. $content.' - Family Days',
-            'sound' => "default",
-            'color' => "#203E78",
-            'type' => $type,
-            'notification_id' => $notificationId
-        );
+        $fcmNotification = array();
 
-        $fcmNotification = array(
-            'registration_ids' => array($token),
-            'priority' => 'high',
-            'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
-            'type' => $type,
+        if($deviceType == 1) // iOs
+        {
 
-            'headers' => array( 'apns-priority' => '10'),
-            'content_available' => true,
-            'notification'=> $notification,
-            'data' => array(
-                "date" => date('d-m-Y H:i:s'),
-                "message" => $rewardName,
-                "type" => $type,
-                'vibrate' => 1,
-                'sound' => 1,
+          $notification = array(
+              'body' => $rewardName,
+              'title' => $rewardName.' '. $content.' - Family Days',
+              'sound' => "default",
+              'color' => "#203E78",
+              'type' => $type,
+              'notification_id' => $notificationId
+          );
+
+          $fcmNotification = array(
+              'registration_ids' => array($token),
+              'priority' => 'high',
+              'aps'=>array('alert'=>array('title'=>'test','body'=>'body'), 'content-available'=>1,'mutable_content' =>1),
+              'type' => $type,
+
+              'headers' => array( 'apns-priority' => '10'),
+              'content_available' => true,
+              'notification'=> $notification,
+              'data' => array(
+                  "date" => date('d-m-Y H:i:s'),
+                  "message" => $rewardName,
+                  "type" => $type,
+                  'vibrate' => 1,
+                  'sound' => 1,
+                  'notification_id' => $notificationId
+              )
+          );
+
+        }
+
+        if($deviceType == 2) // Andriod
+        {
+            $notification = [
+                'date'      => date('d-m-Y H:i:s'),
+                'title'     => $rewardName.' '. $content.' - Family Days',
+                'body'      => $rewardName,
+                'sound'     => "default",
+                'color'     => "#203E78",
+                'type'      => $type,
+                'message'   => $rewardName,
+                'vibrate'   => 1,
+                'badge'     => 1,
                 'notification_id' => $notificationId
-            )
-        );
+              ];
+              
+              $extraNotificationData = $notification;
+
+              $fcmNotification = [
+                  'to'   => $token,
+                  'data' => $extraNotificationData
+              ];
+        }
 
         $fcmNotification = json_encode ( $fcmNotification );
 
