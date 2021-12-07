@@ -26,10 +26,10 @@ class ChildHomeController extends Controller
      @ CREATE DATE : 29/05/2020
      @ CREATE BY : JAYESH SUKHADIYA
      */
-    public function childAssignFinishedChores(Request $request)
+    public function childAssignFinishedChores(Request $request) // today
     {
         $header = $request->header('token');
-        $loadMore = $request->load_more;
+        $loadMore = $request->load_more; // 2 filter
         $from_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->from_date)));
         $to_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->to_date)));
         $status = $request->status;
@@ -64,30 +64,29 @@ class ChildHomeController extends Controller
                         {
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }
                             else if($fromDate)
                             {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }else{
                               $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(500)->get()->splice(6);
                             }
                         }else
                         {
                             $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(500)->get()->splice(6);
-                            }
+                        }
                     }else if($loadMore == 0){
 
                         if($status == "assign_chores")
                         {       
-
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
+                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }
                             else if($fromDate)
                             {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
+                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }else{
                               $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
                             }
@@ -188,11 +187,11 @@ class ChildHomeController extends Controller
                         {
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {  
-                               $finishedChores = $finishedQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(500)->get()->splice(6);
+                               $finishedChores = $finishedQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(500)->get();
                             }
                             else if($fromDate)
                             {
-                                $finishedChores = $finishedQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(500)->get()->splice(6);
+                                $finishedChores = $finishedQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(500)->get();
                             }else{
                               $finishedChores = $finishedQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(500)->get()->splice(6);
                             }
@@ -208,11 +207,11 @@ class ChildHomeController extends Controller
 
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {  
-                               $finishedChores = $finishedQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
+                               $finishedChores = $finishedQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
                             }
                             else if($fromDate)
                             {
-                                $finishedChores = $finishedQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
+                                $finishedChores = $finishedQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
                             }else{
                               $finishedChores = $finishedQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
                             }

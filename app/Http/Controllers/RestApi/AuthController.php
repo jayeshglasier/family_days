@@ -122,7 +122,7 @@ class AuthController extends Controller
                 $insertData->use_total_member = 1;
                 $insertData->use_total_point = 0;
                 $insertData->use_fcm_token = $request->device_token ? $request->device_token:'';
-                $insertData->use_device_type = $request->device_type ? $reques->device_type:0;
+                $insertData->use_device_type = $request->device_type ? $request->device_type:0;
                 $insertData->created_at = date('Y-m-d H:i:s');
                 $insertData->updated_at = date('Y-m-d H:i:s');
                 $insertData->email_verified_at = date('Y-m-d H:i:s');

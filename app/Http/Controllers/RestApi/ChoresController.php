@@ -216,7 +216,6 @@ class ChoresController extends Controller
         $from_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->from_date)));
         $to_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->to_date)));
         $childId = $request->child_id;
-        // dd($childId);
 
         if($from_date == "1970-01-01")
         {
@@ -240,108 +239,55 @@ class ChoresController extends Controller
                 {
                     $userRecord = DB::table('users')->select('id','use_fam_unique_id','use_is_admin','use_parents_id','use_role','use_is_reset')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id');
+                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_is_daily',0);
                   
                     if($userRecord->use_is_admin == 1)
-                    {   
-                        if($loadMore == 1)
+                    {
+                        if($fromDate && $toDate && $childId)
                         {
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                            $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                        }else if($fromDate && $toDate) // FROM DATE FILTER
+                        {  
+                           $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
-                        }else {
-
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
+                        }else if($fromDate && $childId)
+                        {
+                            $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                        }
+                        else if($fromDate)
+                        {
+                            $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                        }
+                        else if($childId)
+                        {  
+                            $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                        }else{
+                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }
                     }else
                     {
-                        if($loadMore == 1)
+                        if($fromDate && $toDate && $childId)
                         {
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                            $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
+                        }else if($fromDate && $toDate) // FROM DATE FILTER
+                        {  
+                           $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get()->splice(6);
-                            }
+                        }else if($fromDate && $childId)
+                        {
+                            $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                        }
+                        else if($fromDate)
+                        {
+                            $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                        }
+                        else if($childId)
+                        {  
+                            $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }else{
-                           if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(6)->get();
-                            }
+                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }
                     }
 
@@ -559,110 +505,60 @@ class ChoresController extends Controller
                 { 
                     $userRecord = DB::table('users')->select('id','use_fam_unique_id','use_is_admin','use_parents_id','use_role')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id');
+                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_is_daily',0);
                     
                     if($userRecord->use_is_admin == 1)
                     {
-                        if($loadMore == 1)
+                       
+                        if($fromDate && $toDate && $childId)
                         {
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
 
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
+                        }else if($fromDate && $toDate) // FROM DATE FILTER
+                        {  
+                           $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
 
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                        }else{
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
+                        }else if($fromDate && $childId)
+                        {
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
                         }
+                        else if($fromDate)
+                        {
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }
+                        else if($childId)
+                        {  
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }else{
+                             $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }
+                        
                     }
                     else if($userRecord->use_role == 2 || $userRecord->use_role == 3 || $userRecord->use_role == 4 || $userRecord->use_role == 5)
                     {
-                        if($loadMore == 1)
+                        if($fromDate && $toDate && $childId)
                         {
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
 
-                         if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
+                        }else if($fromDate && $toDate) // FROM DATE FILTER
+                        {  
+                           $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
 
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
-                            }
-                        }else{
-                            if($fromDate && $toDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-
-                            }else if($fromDate && $toDate) // FROM DATE FILTER
-                            {  
-                               $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereBetween('cho_date', [$from_date,$to_date])->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-
-                            }else if($fromDate && $childId)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
-                            else if($fromDate)
-                            {
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
-                            else if($childId)
-                            {  
-                                $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }else{
-                                 $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
-                            }
+                        }else if($fromDate && $childId)
+                        {
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
                         }
+                        else if($fromDate)
+                        {
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereDate('cho_date', $from_date)->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }
+                        else if($childId)
+                        {  
+                            $adminChores = $choreQuery->where('cho_is_expired','Completed')->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }else{
+                             $adminChores = $choreQuery->where('cho_is_expired','Completed')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
+                        }
+                        
                     }
                     
                     if(!$adminChores->isEmpty())
