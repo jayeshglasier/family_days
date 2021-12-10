@@ -35,6 +35,7 @@ Route::post('contact-admin', 'RestApi\UserController@contactAdmin');
 
 Route::get('chore-icon-list','RestApi\ChoresController@getChoreIcons');
 
+
 Route::post('admin_assigned_chores_list','RestApi\ChoresController@assignedChores');
 Route::post('admin_finished_chores_list','RestApi\ChoresController@finishedChores');
 Route::post('assigned_chores_filter','RestApi\ChoresController@assignedChoresFilter');

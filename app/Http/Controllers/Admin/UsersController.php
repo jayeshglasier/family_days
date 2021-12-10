@@ -249,15 +249,13 @@ class UsersController extends Controller
     }
 
     public function memberDestroy($id)
-    { 
+    {   
         if(User::where('use_family_id',$id)->exists())
         {
             $userData = User::select('id','use_parents_id','use_fam_unique_id','use_total_member')->where('use_family_id',$id)->first();
             $parentsData = User::select('use_family_id')->where('id',$userData->use_parents_id)->first();
             User::where('use_family_id',$id)->delete();
-            Chores::where('cho_child_id',$userData->id)->delete();
-            Rewards::where('red_family_id',$userData->id)->delete();
-
+           
             $updateData['use_total_member'] = $userData->use_total_member -1;
             $update = User::where('use_fam_unique_id',$userData->use_fam_unique_id)->update($updateData);
 
