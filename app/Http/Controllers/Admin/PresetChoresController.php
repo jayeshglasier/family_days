@@ -78,14 +78,6 @@ class PresetChoresController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-
     public function store(Request $request)
     {
         $this->validateStore($request);
@@ -117,10 +109,10 @@ class PresetChoresController extends Controller
             if($insertData)
             {
                 Session::flash('success', 'Preset chores created!');
-                return redirect()->intended('/preset-chores');
+                return redirect('/preset-chores');
             }else{
                 Session::flash('error', "Preset chores isn't created!");
-                return redirect()->intended('/preset-chores');
+                return redirect('/preset-chores');
             }
             
         }catch (\Exception $e) {
@@ -133,7 +125,7 @@ class PresetChoresController extends Controller
     {
         $this->validate($request, [
         'pre_title' => 'required|max:100',
-        'pre_icon' => 'required|image|mimes:jpeg,png,gif,jpg|max:2040',
+        'pre_icon' => 'required|image|mimes:jpeg,png,gif,jpg|max:2040|dimensions:max_width=50,max_height=50',
         ]);   
     }
 
@@ -184,7 +176,7 @@ class PresetChoresController extends Controller
     {
         $this->validate($request, [
         'pre_title' => 'required|max:200',
-        'pre_icon' => 'image|mimes:jpeg,png,gif,jpg|max:2040',
+        'pre_icon' => 'image|mimes:jpeg,png,gif,jpg|max:2040|dimensions:max_width=50,max_height=50',
         ]);   
     }
 

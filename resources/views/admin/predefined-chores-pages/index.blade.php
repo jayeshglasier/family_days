@@ -128,6 +128,7 @@
                                                                 <option value="1" @if($data->pre_status == 1) selected="true" @endif>Inactive</option>
                                                                 @endif
                                                             </select>
+                                                            <p style="margin: 10px 0 -4px;"> Note : icon upload max width=50, max height=50</p>
                                                             </div>
                                                             </div>
                                                         </div>
@@ -204,10 +205,12 @@
                             <option value="0">Active</option>
                             <option value="1">Inactive</option>
                         </select>
+                        <p style="margin: 10px 0 -4px;"> Note : icon upload max width=50, max height=50</p>
                         </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times-circle-o" aria-hidden="true"></i> Cancle</button>
                     <button type="submit" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Save</button>

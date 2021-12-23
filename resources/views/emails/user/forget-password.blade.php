@@ -3,61 +3,60 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Forget Password Mail</title>
     <style type="text/css">
-      body{
-         background-color: #e8e4e4;
-         font-family: Arial, Helvetica, sans-serif;;
-        font-size: 14px;
-        line-height: 1.12857143;
-        color: #847f7f;
-      }
-      p{
-        margin-left: 15px;
-      }
+    body{background-color:#eff0f0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.12857143;color:#847f7f}p{margin-left:15px}.btn-info{color:#fff;background-color:#0685c4;border-color:#46b8da}.btn{display:inline-block;margin-bottom:0;font-weight:400;text-align:center;white-space:nowrap;vertical-align:middle;touch-action:manipulation;cursor:pointer;background-image:none;border:1px solid transparent;border-top-color:transparent;border-right-color:transparent;border-bottom-color:transparent;border-left-color:transparent;padding:6px 12px;font-size:14px;line-height:1.42857143;border-radius:4px;user-select:none}
     </style>
   </head>
 <body>
 <table class="table" style="width: 100%;">
   <tr>
-    <td width="20%"></td>
-    <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;border-top: 1px solid #d7d0d0;background-color: white;text-align: center;"><img src="{{ asset('public/images/logo/family-days-app-icon.svg')}}" style="height: 250px;" /></td>
-    <td width="20%"></td>
+   <td width="30%"></td>
+    <td width="40%" style="background-color: white;text-align: center;padding: 25px;background-color: #eff0f0;font-size: 20px;">
+          <table border="0" cellpadding="0" cellspacing="0" width="480" >
+              <tr>
+                  <td align="center" valign="top">
+                      <a href="#">
+                        <img alt="Logo" src="{{ asset('public/images/logo/family-days-app-icon.svg')}}" width="220" height="170" style="display: block;  font-family: 'Lato', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+                      </a>
+                  </td>
+              </tr>
+          </table>
+     </td>
+      <td width="30%"></td>
   </tr>
  <tr>
-    <td width="20%"></td>
-    <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;">
-      <p style="color: #ca6710;font-weight: 500;font-size: 16px;">Resetting your password for family days</p>
-      <p><b>Hello {{ $userdetail['full_name'] }},</b></p>
-      <p>We have sent you this email in response to your request to reset your password on family days app. After you reset your password to change to your own password.</p>
-      <p>To set a password for your account,</p>
-      <p>You can access the family days application with following credentials:</p></td>
-    <td width="20%"></td>
-  </tr>
-    <tr>
-      <td width="20%"></td>
-      <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;">
-        <table class="table" style="border-collapse: collapse;margin-left: 15px;margin-right: 15px;margin-top:15px;width: 90%;">
+   <td width="30%"></td>
+    <td width="40%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;">
+      <p style="color: black;font-weight: 500;font-size: 20px;"><b>Hello {{ $userdetail['full_name'] }}</b></p>
+      <p style="font-size: 16px;">You are receiving this email because we received a password reset request for your account.</p>
+       <table class="table" style="border-collapse: collapse;margin-left: 15px;margin-right: 15px;margin-top:15px;width: 90%;">
           <tbody>
-           <tr>
-              <td style="border:1px solid #ccc5c5;padding: 8px;width: 25%;font-weight: 600;">Login Username </td>
+            <tr>
+              <td style="border:1px solid #ccc5c5;padding: 8px;width: 30%;font-weight: 600;">Login Username </td>
               <td style="border:1px solid #ccc5c5;padding: 8px;">{{ $userdetail['username'] }} / {{ $userdetail['email'] ? $userdetail['email']:'NA' }}</td>
             </tr>
             <tr>
-              <td style="border:1px solid #ccc5c5;padding: 8px;width: 25%;font-weight: 600;">Password</td>
+              <td style="border:1px solid #ccc5c5;padding: 8px;width: 30%;font-weight: 600;">Password</td>
               <td style="border:1px solid #ccc5c5;padding: 8px;">{{ $password }}</td>
             </tr>
           </tbody>
         </table>
-        <p style="color: #6f5f5f;">* We recommend that you keep your password secure and not share it with anyone.</p>
+      <p style="font-size: 16px;">If you did not request a password reset, no further action is required.</p>
+      <p style="font-size: 16px;">Regards,</p>
+      <p style="font-size: 16px;">Family Days</p></td>
+      <td width="30%"></td>
+  </tr>
+    <tr>
+      <td width="30%"></td>
+      <td width="40%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;text-align: center;">
+        <p style="color: #9b9a9a;font-size:13px;" style="text-align: center;">Please reach out to admin@familydays.com in case of any feedback! </p>
       </td>
-    <td width="20%"></td>
+    <td width="30%"></td>
   </tr>
   <tr>
-   <td width="20%"></td>
-    <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: black;">
-      <p style="text-align: center;color: white;">This message was sent to <span style="color: orange;">familydays@yahoo.com.</span> If this is not you please delete this email and send an email to support to report this error. This email has been generated with user knowledge by our system. Please login to change your preference if you no longer wish to receive this email. or contact support. We do not transmit nor do we ask for sensitive information over email. If any such information is transmitted or requested over email please report it to support. If you have any questions, contact us at <span style="color: orange;">support@familydays.com</span></p>
-    <td width="20%"></td>
+    <td width="100%" style="background-color: white;text-align: center;padding: 25px;background-color: #eff0f0;font-size: 14px;" colspan="3"><b style="color: #a4a2a2;">© 2020 Family Days. All rights reserved.</b></td>
   </tr>
 </table>
 </body>

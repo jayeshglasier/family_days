@@ -116,7 +116,7 @@ class ChoresModuleController extends Controller
                                                 $insertData->cho_is_daily = 1; // 0 = No Daily 1 = Daily
                                                 $insertData->cho_daily_chores = "daily_chores";
                                                 $insertData->cho_point = $request['set_point'] ? $request['set_point']:10;
-                                                $insertData->cho_set_time = $dateDaily->format('Y-m-d').' ' .$time;
+                                                $insertData->cho_set_time = $dateDaily->format('Y-m-d 23:59:59');
                                                 $insertData->cho_date = $dateDaily->format('Y-m-d');
                                                 $insertData->cho_status = 0; // 0 = Assigned Chore / 1 = Finished
                                                 $insertData->cho_is_complete = 0; // 0 = No Daily 1 = Daily
@@ -466,7 +466,7 @@ class ChoresModuleController extends Controller
                                         $insertData->cho_is_daily = 1; // 0 = No Daily 1 = Daily
                                         $insertData->cho_daily_chores = "daily_chores";
                                         $insertData->cho_point = $request['set_point'] ? $request['set_point']:10;
-                                        $insertData->cho_set_time = $dateDaily->format('Y-m-d').' ' .$time;
+                                        $insertData->cho_set_time = $dateDaily->format('Y-m-d 23:59:59');
                                         $insertData->cho_date = $dateDaily->format('Y-m-d');
                                         $insertData->cho_status = 0; // 0 = Assigned Chore / 1 = Finished
                                         $insertData->cho_is_complete = 0; // 0 = No Daily 1 = Daily
