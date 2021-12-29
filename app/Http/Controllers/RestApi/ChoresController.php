@@ -80,7 +80,7 @@ class ChoresController extends Controller
                     //------------------------- END EXPIRED CHORES STORE -----------------------
 
                     $toDate = $currentDate;
-                    $choresQuery = Chores::select('cho_id','cho_family_id','cho_title','cho_point','cho_icon','id','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_last_date')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$familyId)->where('cho_status',0)->where('cho_is_daily',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC');
+                    $choresQuery = Chores::select('cho_id','cho_family_id','cho_title','cho_point','cho_icon','id','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_last_date')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$familyId)->where('cho_is_daily',0)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC');
 
                     $choresAssignCount = Chores::select('cho_status')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$familyId)->where('cho_status',0)->where('cho_is_confirmation',0)->count();
 
@@ -96,7 +96,7 @@ class ChoresController extends Controller
                         $i = 0; $userDetails = array();
                         foreach ($adminChores as $key => $value)
                         {   
-                            $currentDate = date('Y-m-d');
+                            //$currentDate = date('Y-m-d');
                             $recordReward = $value['cho_last_date'];
 
                             if($recordReward)
@@ -239,7 +239,7 @@ class ChoresController extends Controller
                 {
                     $userRecord = DB::table('users')->select('id','use_fam_unique_id','use_is_admin','use_parents_id','use_role','use_is_reset')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_is_daily',0);
+                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id');
                   
                     if($userRecord->use_is_admin == 1)
                     {
@@ -263,7 +263,7 @@ class ChoresController extends Controller
                         {  
                             $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }else{
-                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->where('cho_is_daily',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }
                     }else
                     {
@@ -287,7 +287,7 @@ class ChoresController extends Controller
                         {  
                             $adminChores = $choreQuery->whereIn('cho_child_id',explode(',',$childId))->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }else{
-                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                             $adminChores = $choreQuery->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',0)->where('cho_is_daily',0)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                         }
                     }
 
@@ -392,7 +392,6 @@ class ChoresController extends Controller
                         }else{
                             $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
                         }
-
                     }else if($userRecord->use_role == 2 || $userRecord->use_role == 3)
                     {
                         $userId = $userRecord->use_parents_id;
@@ -505,7 +504,7 @@ class ChoresController extends Controller
                 { 
                     $userRecord = DB::table('users')->select('id','use_fam_unique_id','use_is_admin','use_parents_id','use_role')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_is_daily',0);
+                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id');
                     
                     if($userRecord->use_is_admin == 1)
                     {
