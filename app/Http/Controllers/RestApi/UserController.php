@@ -4,6 +4,8 @@ namespace App\Http\Controllers\RestApi;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use App\Http\Resources\UsersCollection;
+use App\Http\Resources\ChildListCollection;
 use Illuminate\Http\Request;
 use App\Helper\ResponseMessage;
 use App\Helper\Exceptions;
@@ -345,88 +347,20 @@ class UserController extends Controller
     {
         try
         {
-            $header = $request->header('token');
+            $header = $request->header('token'); // User token
+            $usertDetail = DB::table('users')->select('id as user_id','email','use_token as token','use_full_name as full_name','use_image','use_role','use_parents_id','use_is_admin','use_fam_unique_id')->where('use_token',$header)->first();
+        
+            $userRecords = DB::table('users')->select('id as user_id','email','use_token as token','use_full_name as full_name','use_image','use_role','use_is_admin','use_username','use_total_point')->where('use_fam_unique_id',$usertDetail->use_fam_unique_id)->orderBy('use_role','ASC')->get();
 
-            if($header)
-            {
-                if(User::where('use_token',$header)->exists())
-                {
-                    if(User::where('use_token',$header)->where('use_status',0)->exists())
-                    {   
-                        $usertDetail = DB::table('users')->select('id as user_id','email','use_token as token','use_full_name as full_name','use_image','use_role','use_parents_id','use_is_admin','use_fam_unique_id')->where('use_token',$header)->first();
-                        
-                        $userRecords = DB::table('users')->select('id as user_id','email','use_token as token','use_full_name as full_name','use_image','use_role','use_is_admin','use_username','use_total_point')->where('use_fam_unique_id',$usertDetail->use_fam_unique_id)->orderBy('use_role','ASC')->get();
+            if(!$userRecords->isEmpty())
+            { 
+                $result = new UsersCollection($userRecords);
+                $message = "Family member list";
+                return json_encode(['status' => true, 'error' => 200, 'message' => $message, 'data'=> $result],JSON_UNESCAPED_SLASHES);
 
-                        if(!$userRecords->isEmpty())
-                        { 
-                        $userDetails = array();
-                        foreach ($userRecords as $key => $value)
-                        { 
-                            if($value->use_image)
-                            {
-                                $profileurl = url("public/images/user-images/".$value->use_image);
-                            }else{
-                                $profileurl = url("public/images/user-images/user-profile.png");
-                            }
-
-                            if($value->use_role == 2)
-                            {
-                                $userType = "Father";
-                            }else if($value->use_role == 3){
-                                $userType = "Mother";
-                            }else if($value->use_role == 4){
-                                $userType = "Son";
-                            }else if($value->use_role == 5){
-                                $userType = "Daughter";
-                            }else{
-                                $userType = "";
-                            }
-
-                            if($value->use_is_admin == 1)
-                            {
-                                $isAdmin = "Admin";
-                            }else{
-                                $isAdmin = "";
-                            }
-
-                            $userDetails[] = array(
-                                "child_id" => $value->user_id,
-                                "username" => $value->use_username,
-                                "full_name" => $value->full_name,
-                                "email" => $value->email,
-                                "token" => $value->token,
-                                "role" => $value->use_role,
-                                "role_type" => $userType,
-                                "is_admin" => $isAdmin,
-                                "reward_point" => $value->use_total_point,
-                                "profile_url" => $profileurl);
-                        }
-
-                        array_walk_recursive($userDetails, function (&$item, $key) {
-                        $item = null === $item ? '' : $item;
-                        });
-                        $this->data[$key] = $userDetails;
-
-                        $message = "Family member list";
-                        return json_encode(['status' => true, 'error' => 200, 'message' => $message, 'data'=> $this->data[$key]],JSON_UNESCAPED_SLASHES);
-
-                        }else{
-                          $msg = "No any child found";
-                          return json_encode(['status' => true, 'error' => 200, 'message' => $msg,'data' => array()],JSON_UNESCAPED_SLASHES);
-                    }
-                    }else
-                    {
-                        $msg = "Your account isn't active.";
-                        return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
-                    }
-                }
-                else{
-                    $msg = "Token isn't valid!";
-                    return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
-                }
             }else{
-                $msg = "Token is required!";
-                return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
+              $msg = "No any child found";
+              return json_encode(['status' => true, 'error' => 200, 'message' => $msg,'data' => array()],JSON_UNESCAPED_SLASHES);
             }
         }catch (\Exception $e) {    
             Exceptions::exception($e);
@@ -438,78 +372,18 @@ class UserController extends Controller
         try
         {
             $header = $request->header('token');
+            $usertDetail = DB::table('users')->select('id as user_id','use_fam_unique_id')->where('use_token',$header)->first();
+            $userRecords = DB::table('users')->select('id as user_id','use_full_name as full_name')->where('use_fam_unique_id',$usertDetail->use_fam_unique_id)->where('use_role','>',3)->get();
 
-            if($header)
-            {
-                if(User::where('use_token',$header)->exists())
-                {
-                    if(User::where('use_token',$header)->where('use_status',0)->exists())
-                    {   
-                        $usertDetail = DB::table('users')->select('id as user_id','use_fam_unique_id')->where('use_token',$header)->first();
-
-                        $userRecords = DB::table('users')->select('id as user_id','email','use_token as token','use_full_name as full_name','use_image','use_role','use_is_admin')->where('use_fam_unique_id',$usertDetail->use_fam_unique_id)->where('use_role','>',3)->get();
-
-                        if(!$userRecords->isEmpty())
-                        { 
-                        $userDetails = array();
-                        foreach ($userRecords as $key => $value)
-                        { 
-                            if($value->use_image)
-                            {
-                                $profileurl = url("public/images/user-images/".$value->use_image);
-                            }else{
-                                $profileurl = url("public/images/user-images/user-profile.png");
-                            }
-
-                            if($value->use_role == 2)
-                            {
-                                $userType = "Father";
-                            }else if($value->use_role == 3){
-                                $userType = "Mother";
-                            }else if($value->use_role == 4){
-                                $userType = "Son";
-                            }else if($value->use_role == 5){
-                                $userType = "Daughter";
-                            }else{
-                                $userType = "";
-                            }
-
-                            if($value->use_is_admin == 1)
-                            {
-                                $isAdmin = "Admin";
-                            }else{
-                                $isAdmin = "";
-                            }
-
-                            $userDetails[] = array("child_id" => $value->user_id,"full_name" => $value->full_name);
-                        }
-
-                        array_walk_recursive($userDetails, function (&$item, $key) {
-                        $item = null === $item ? '' : $item;
-                        });
-                        $this->data[$key] = $userDetails;
-
-                        $message = "Family member list";
-                        return json_encode(['status' => true, 'error' => 200, 'message' => $message, 'data'=> $this->data[$key]],JSON_UNESCAPED_SLASHES);
-
-                        }else{
-                          $msg = "No any child found";
-                          return json_encode(['status' => true, 'error' => 200, 'message' => $msg,'data' => array()],JSON_UNESCAPED_SLASHES);
-                    }
-                    }else
-                    {
-                        $msg = "Your account isn't active.";
-                        return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
-                    }
-                }
-                else{
-                    $msg = "Token isn't valid!";
-                    return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
-                }
+            if(!$userRecords->isEmpty())
+            { 
+                $msg = "Family child member list";
+                $result = new ChildListCollection($userRecords);
             }else{
-                $msg = "Token is required!";
-                return json_encode(['status' => false, 'error' => 401, 'message' => $msg],JSON_UNESCAPED_SLASHES);
-            }
+                $msg = "No any child found";
+                $result = array();
+            }   
+            return json_encode(['status' => true, 'error' => 200, 'message' => $msg,'data' => $result],JSON_UNESCAPED_SLASHES);
         }catch (\Exception $e) {    
             Exceptions::exception($e);
         }

@@ -30,6 +30,15 @@ class DashboardController extends Controller
         $todayDate = date('Y-m-d', strtotime("-3 days"));
         $adminChores = Chores::select('cho_id')->whereDate('cho_date', '<',$todayDate)->where('cho_status',0)->where('cho_is_expired','<>','Completed')->get();
 
+        $lastFiveYears = date("Y") - 4;
+        $lastSixYears = date("Y") - 5;
+
+        $deleteFiveChores = Chores::whereYear('cho_date',$lastFiveYears)->delete();
+        $deleteSixChores = Chores::whereYear('cho_date',$lastSixYears)->delete();
+
+        $deleteFiveReward = Rewards::whereYear('red_frame_date',$lastFiveYears)->delete();
+        $deleteSixReward = Rewards::whereYear('red_frame_date',$lastSixYears)->delete();
+
         if(!$adminChores->isEmpty())
         {
             foreach($adminChores as $key => $value)

@@ -391,28 +391,4 @@ class AuthController extends Controller
             }
         }
     }
-
-    public function activeUser(Request $request)
-    {
-        $data['language'] = AuthLanguages::multiLanguage($request);
-
-        $header = $request->header('token');
-
-        if($header)
-        {
-            if(User::where('mobile_token',$header)->where('active',1)->exists())
-            {
-                $userActive = ['status' => "active"];
-                ResponseMessage::success($data['language']['active_success'],$userActive);
-            }else if(User::where('mobile_token',$header)->where('active',0)->exists())
-            {
-                $userInactive = ['status' => "inactive"];
-                ResponseMessage::success($data['language']['inactive'],$userInactive);
-            }else{
-                ResponseMessage::error($data['language']['token_invalid']);
-            }
-        }else{
-            ResponseMessage::error($data['language']['token_required']);
-        }
-    }
 }

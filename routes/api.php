@@ -22,10 +22,20 @@ Route::post('edit_profile_image' , 'RestApi\UserController@editProfileImage');
 Route::post('user-details','RestApi\UserController@getUserdetails'); // Change user status 0 = Active 1 = Inctive
 
 Route::post('add_family_member', 'RestApi\UserController@addfamilyMember');
-Route::post('family_member_list', 'RestApi\UserController@familymemberList');
-Route::post('family_child_list', 'RestApi\UserController@childList');
+Route::group([
+      'middleware' => 'api.token'
+    ], function() {
+		Route::post('family_member_list', 'RestApi\UserController@familymemberList');
+		Route::post('family_child_list', 'RestApi\UserController@childList');
 
-Route::post('active_user','RestApi\AuthController@activeUser');
+		// ****************************** BEGIN NOTIFICATION MODULE **************************************
+
+		Route::post('notification-list', 'RestApi\NotificationController@notificationList');
+		Route::post('unread-notification-count', 'RestApi\NotificationController@unreadNotificationCount');
+
+		// ****************************** BEGIN NOTIFICATION MODULE **************************************
+});
+
 Route::post('change_password' , 'RestApi\AuthController@updatePassword');
 Route::post('forget_password' , 'RestApi\AuthController@forgetPassword');
 Route::post('update_details', 'RestApi\UserController@updateDetails');
@@ -34,7 +44,6 @@ Route::post('admin_update_child_profile','RestApi\UserController@childProfileUpd
 Route::post('contact-admin', 'RestApi\UserController@contactAdmin');
 
 Route::get('chore-icon-list','RestApi\ChoresController@getChoreIcons');
-
 
 Route::post('admin_assigned_chores_list','RestApi\ChoresController@assignedChores');
 Route::post('admin_finished_chores_list','RestApi\ChoresController@finishedChores');
@@ -74,8 +83,6 @@ Route::post('filter-user-wise-claim-list','RestApi\RewardsController@fieldchildC
 
 // ****************************** END REWARD MODULE **************************************
 
-Route::post('child-assign-finished-chores','RestApi\ChildHomeController@childAssignFinishedChores');
-
 // ****************************** BEGIN CHAT MODULE **************************************
 Route::post('message-family-member-list', 'RestApi\MessageController@familymemberList');
 Route::post('send-message', 'RestApi\MessageController@createMessage');
@@ -88,12 +95,6 @@ Route::post('delete-message', 'RestApi\MessageController@destroy');
 
 Route::post('child-assign-finished-chores','RestApi\ChildHomeController@childAssignFinishedChores');
 
-// ****************************** BEGIN NOTIFICATION MODULE **************************************
-
-Route::post('notification-list', 'RestApi\NotificationController@notificationList');
-Route::post('unread-notification-count', 'RestApi\NotificationController@unreadNotificationCount');
-
-// ****************************** BEGIN NOTIFICATION MODULE **************************************
 
 
 

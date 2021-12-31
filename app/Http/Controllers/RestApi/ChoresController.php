@@ -52,12 +52,18 @@ class ChoresController extends Controller
                     //------------------------- BEGIN EXPIRED CHORES STORE -----------------------
 
                     $familyId = $userRecord->use_fam_unique_id;
-                    $choresExpired = Chores::select('cho_id','cho_family_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->where('cho_is_expired','<>','Completed')->where('cho_family_id',$familyId)->orderby('cho_id','DESC')->limit(1000)->get();
+
+                    $date = Carbon::createFromFormat('Y-m-d', $currentDate);
+                    $daysToAdd = 2;
+                    $yesterdayDate = $date->addDays($daysToAdd);
+
+                    // "2022-01-01"
+                    $choresExpired = Chores::select('cho_id','cho_is_daily','cho_set_time')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_status',0)->where('cho_is_expired','<>','Completed')->whereDate('cho_set_time','<',date('Y-m-d', strtotime(str_replace('/', '-',$yesterdayDate))))->where('cho_family_id',$familyId)->orderby('cho_id','DESC')->get();
 
                     if(!$choresExpired->isEmpty())
                     { 
                         foreach ($choresExpired as $key => $value)
-                        {
+                        {   
                             if (Carbon::parse($value->cho_set_time)->lt($current_date))
                             {   
                                 $updateData['cho_status'] = 1; // 0 = Assigned Chore / 1 = Finished
@@ -215,6 +221,10 @@ class ChoresController extends Controller
         $loadMore = $request->load_more;
         $from_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->from_date)));
         $to_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->to_date)));
+
+        $current_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-',$request->date_time)));
+        $currentDate = date('Y-m-d', strtotime(str_replace('/', '-',$request->date_time)));
+
         $childId = $request->child_id;
 
         if($from_date == "1970-01-01")
@@ -296,7 +306,7 @@ class ChoresController extends Controller
                         $userDetails = array();
                         foreach ($adminChores as $key => $value)
                         { 
-                            if (Carbon::parse($value->cho_set_time)->gt(Carbon::now()))
+                            if (Carbon::parse($value->cho_set_time)->gt($current_date))
                             {
                                  if($value->cho_icon)
                                 {
@@ -398,7 +408,6 @@ class ChoresController extends Controller
 
                         if($loadMore == 1)
                         {
-
                         $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id','cho_set_time','cho_is_expired')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
                         }else{
                         $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id','cho_set_time','cho_is_expired')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
@@ -410,7 +419,7 @@ class ChoresController extends Controller
                         
                         if($loadMore == 1)
                         {
-                        $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
+                            $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get()->splice(6);
                         }else{
                             $adminChores = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_is_expired','cho_is_complete_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_family_id',$userRecord->use_fam_unique_id)->where('cho_status',1)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->limit(6)->get();
                         }

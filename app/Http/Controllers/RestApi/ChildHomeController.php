@@ -20,18 +20,15 @@ use Carbon\Carbon;
 
 class ChildHomeController extends Controller
 {
-    /**
-     @ ASSIGNED CHORES / NEW CHORES LIST API 
-     @ IN THIS API TO SHOW ALL ASSIGNED CHORE AS FAMILY WISE
-     @ CREATE DATE : 29/05/2020
-     @ CREATE BY : JAYESH SUKHADIYA
-     */
     public function childAssignFinishedChores(Request $request) // today
     {
         $header = $request->header('token');
         $loadMore = $request->load_more; // 2 filter
         $from_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->from_date)));
         $to_date = date('Y-m-d', strtotime(str_replace('/', '-',$request->to_date)));
+
+        $current_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-',$request->date_time)));
+        $currentDate = date('Y-m-d', strtotime(str_replace('/', '-',$request->date_time)));
         $status = $request->status;
 
         if($from_date == "1970-01-01")
@@ -56,7 +53,7 @@ class ChildHomeController extends Controller
                 {
                     $userRecord = DB::table('users')->select('id','use_full_name','use_image','use_total_point')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','id','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_last_date')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_child_id',$userRecord->id)->where('cho_status',0);
+                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_child_id',$userRecord->id)->where('cho_status',0);
 
                     if($loadMore == 1)
                     {   
@@ -64,13 +61,13 @@ class ChildHomeController extends Controller
                         {
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {  
-                               $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
+                                $adminChores = $choreQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }
                             else if($fromDate)
                             {
                                 $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }else{
-                              $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(500)->get()->splice(6);
+                                $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->where('cho_is_daily',0)->limit(500)->get()->splice(6);
                             }
                         }else
                         {
@@ -103,10 +100,8 @@ class ChildHomeController extends Controller
                         $userDetails = array();
                         foreach ($adminChores as $key => $value)
                         { 
-
-                            if (Carbon::parse($value->cho_set_time)->gt(Carbon::now()))
+                            if (Carbon::parse($value->cho_set_time)->gt($current_date))
                             {
-                                $currentDate = date('Y-m-d');
                                 $recordReward = $value->cho_last_date;
 
                                 if($value->cho_icon)
@@ -201,10 +196,8 @@ class ChildHomeController extends Controller
 
                     }else if($loadMore == 0)
                     {
-
                         if($status == "finished_chores")
                         {
-
                             if($fromDate && $toDate) // FROM DATE FILTER
                             {  
                                $finishedChores = $finishedQuery->whereBetween('cho_date', [$from_date,$to_date])->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'DESC')->get();
