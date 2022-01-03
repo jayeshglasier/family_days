@@ -88,7 +88,7 @@ class DailyChoresNotification extends Command
 
           $notification = array(
               'body' => $choresTitle,
-              'title' => $choresTitle.' '. $content.' - Family Days',
+              'title' => $choresTitle.' '. $content.' - ChoreUp',
               'sound' => "default",
               'color' => "#203E78",
               'type' => $type,
@@ -119,7 +119,7 @@ class DailyChoresNotification extends Command
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $choresTitle.' '. $content.' - Family Days',
+                'title'     => $choresTitle.' '. $content.' - ChoreUp',
                 'body'      => $choresTitle,
                 'sound'     => "default",
                 'color'     => "#203E78",

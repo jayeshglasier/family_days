@@ -45,18 +45,18 @@
         </table>
       <p style="font-size: 16px;">If you did not request a password reset, no further action is required.</p>
       <p style="font-size: 16px;">Regards,</p>
-      <p style="font-size: 16px;">Family Days</p></td>
+      <p style="font-size: 16px;">ChoreUp</p></td>
       <td width="30%"></td>
   </tr>
     <tr>
       <td width="30%"></td>
       <td width="40%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;text-align: center;">
-        <p style="color: #9b9a9a;font-size:13px;" style="text-align: center;">Please reach out to admin@familydays.com in case of any feedback! </p>
+        <p style="color: #9b9a9a;font-size:13px;" style="text-align: center;">Please reach out to admin@choreup.com in case of any feedback! </p>
       </td>
     <td width="30%"></td>
   </tr>
   <tr>
-    <td width="100%" style="background-color: white;text-align: center;padding: 25px;background-color: #eff0f0;font-size: 14px;" colspan="3"><b style="color: #a4a2a2;">© 2020 Family Days. All rights reserved.</b></td>
+    <td width="100%" style="background-color: white;text-align: center;padding: 25px;background-color: #eff0f0;font-size: 14px;" colspan="3"><b style="color: #a4a2a2;">© 2020 ChoreUp. All rights reserved.</b></td>
   </tr>
 </table>
 </body>

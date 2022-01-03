@@ -47,7 +47,7 @@ class SystemSettingController extends Controller
                 $imagesname = $selectImages->sys_logo;
             }
 
-            $updateData['sys_name'] = $request['sys_name'] ? $request['sys_name']:'Family Days';
+            $updateData['sys_name'] = $request['sys_name'] ? $request['sys_name']:'ChoreUp';
             $updateData['sys_min_chores'] = $request['sys_min_chores'] ? $request['sys_min_chores'] : 10;
             $updateData['sys_max_chores'] = $request['sys_max_chores'] ? $request['sys_max_chores'] : 100;
             $updateData['sys_min_reward'] = $request['sys_min_reward'] ? $request['sys_min_reward'] : 10;

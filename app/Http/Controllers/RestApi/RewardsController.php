@@ -302,7 +302,7 @@ class RewardsController extends Controller
         {
             $notification = array(
                 'body' => $rewardName,
-                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - ChoreUp',
                 'sound' => "default",
                 'color' => "#203E78",
                 'type' => $rewardByChildType,
@@ -336,7 +336,7 @@ class RewardsController extends Controller
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - ChoreUp',
                 'body'      => $rewardName,
                 'sound'     => "default",
                 'color'     => "#203E78",
@@ -826,7 +826,7 @@ class RewardsController extends Controller
 
             $notification = array(
                 'body' => $rewardName,
-                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'title' => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - ChoreUp',
                 'sound' => "default",
                 'color' => "#203E78",
                 'type' => $rewardByChildType,
@@ -860,7 +860,7 @@ class RewardsController extends Controller
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - Family Days',
+                'title'     => $rewardName. ' '.$rewardByChildContent.' '. $use_username.' - ChoreUp',
                 'body'      => $rewardName,
                 'sound'     => "default",
                 'color'     => "#203E78",
@@ -1332,7 +1332,7 @@ class RewardsController extends Controller
                                         {
                                           $notificationMessage = array(
                                             'body' => $rewardDetails->red_rewards_name,
-                                            'title' => $rewardDetails->red_rewards_name. ' '.$notification['cliamchildContent'].' '. $userRecord->use_username.' - Family Days',
+                                            'title' => $rewardDetails->red_rewards_name. ' '.$notification['cliamchildContent'].' '. $userRecord->use_username.' - ChoreUp',
                                             'sound' => "default",
                                             'color' => "#203E78",
                                             'type' => $notification['cliamchildType'],

@@ -21,8 +21,8 @@ class ForgetPassword extends Mailable
     public function build()
     {
         $address = env('MAIL_USERNAME');
-        $subject = 'Resetting your password for Family Days';
-        $name = 'Family Days';
+        $subject = 'Resetting your password for ChoreUp';
+        $name = 'ChoreUp';
         
         return $this->view('emails.user.forget-password')
         ->from($address, $name)

@@ -208,7 +208,7 @@ class SendDailyNotification extends Command
 
             $notification = array(
                 'body' => $choreName,
-                'title' => $choreName.' '. $content.' - Family Days',
+                'title' => $choreName.' '. $content.' - ChoreUp',
                 'sound' => "default",
                 'color' => "#203E78",
                 'type' => $type,
@@ -241,7 +241,7 @@ class SendDailyNotification extends Command
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $choreName.' '. $content.' - Family Days',
+                'title'     => $choreName.' '. $content.' - ChoreUp',
                 'body'      => $choreName,
                 'sound'     => "default",
                 'color'     => "#203E78",

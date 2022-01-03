@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Login - Family Days</title>
+    <title>Login - ChoreUp</title>
     <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.jpg') }}" />
     <link href="{{ asset('public/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- MetisMenu CSS -->

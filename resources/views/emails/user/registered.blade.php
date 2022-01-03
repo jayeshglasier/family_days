@@ -27,9 +27,9 @@
  <tr>
     <td width="20%"></td>
     <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: white;">
-      <p style="color: #ca6710;font-weight: 500;font-size: 16px;">New register in family days</p>
+      <p style="color: #ca6710;font-weight: 500;font-size: 16px;">New register in ChoreUp</p>
       <p><b>Hello {{ $userdetail['full_name'] }},</b></p>
-      <p>Your account has been registered on family days</p>
+      <p>Your account has been registered on ChoreUp</p>
       <p>You can sign in to your account by using your this usernamee {{ $userdetail['username'] }} or email {{ $userdetail['email'] ? $userdetail['email']:'NA' }} and password set by you,</p>
      </td>
     <td width="20%"></td>
@@ -85,7 +85,7 @@
   <tr>
    <td width="20%"></td>
     <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;background-color: black;">
-      <p style="text-align: center;color: white;">This message was sent to <span style="color: orange;">familydays@yahoo.com.</span> If this is not you please delete this email and send an email to support to report this error. This email has been generated with user knowledge by our system. Please login to change your preference if you no longer wish to receive this email. or contact support. We do not transmit nor do we ask for sensitive information over email. If any such information is transmitted or requested over email please report it to support. If you have any questions, contact us at <span style="color: orange;">support@familydays.com</span></p>
+      <p style="text-align: center;color: white;">This message was sent to <span style="color: orange;">choreup@yahoo.com.</span> If this is not you please delete this email and send an email to support to report this error. This email has been generated with user knowledge by our system. Please login to change your preference if you no longer wish to receive this email. or contact support. We do not transmit nor do we ask for sensitive information over email. If any such information is transmitted or requested over email please report it to support. If you have any questions, contact us at <span style="color: orange;">support@choreup.com</span></p>
     <td width="20%"></td>
   </tr>
 </table>

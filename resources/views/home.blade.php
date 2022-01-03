@@ -6,9 +6,9 @@
 @media only screen and (max-width: 2500px) and (min-width: 500px)
 {
     .modal-dialog {
-        width: 478px;
-        margin: 30px auto;
-    }
+    width: 478px;
+    margin: 30px auto;
+}
 }
 </style>
 <script type="text/javascript">
@@ -78,6 +78,35 @@
             </div>
         </div>
     </div>
+   <!--  <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <b>Message from Parents</b>
+                </div>
+                <div class="panel-body">
+                  <blockquote>
+                        <p style="font-size: 14px">Here are all the possible meanings and translations of the word dummy message</p>
+                        <small>James Bond
+                            <cite style="float: right;">Aug-21-2020</cite>
+                        </small>
+                    </blockquote>
+                    <blockquote>
+                        <p style="font-size: 14px">Here are all the possible meanings and translations of the word dummy message</p>
+                        <small>James Bond
+                            <cite style="float: right;">Aug-21-2020</cite>
+                        </small>
+                    </blockquote>
+                    <blockquote>
+                        <p style="font-size: 14px">Here are all the possible meanings and translations of the word dummy message</p>
+                        <small>James Bond
+                            <cite style="float: right;">Aug-21-2020</cite>
+                        </small>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div> -->
 </div>
 
 </html>

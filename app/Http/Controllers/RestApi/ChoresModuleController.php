@@ -339,7 +339,7 @@ class ChoresModuleController extends Controller
         {
             $notification = array(
             'body' => $choreName,
-            'title' => $choreName. ' '.$content.' '. $use_username.' - Family Days',
+            'title' => $choreName. ' '.$content.' '. $use_username.' - ChoreUp',
             'sound' => "default",
             'color' => "#203E78",
             'type' => $type,
@@ -373,7 +373,7 @@ class ChoresModuleController extends Controller
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $choreName. ' '.$content.' '. $use_username.' - Family Days',
+                'title'     => $choreName. ' '.$content.' '. $use_username.' - ChoreUp',
                 'body'      => $choreName,
                 'sound'     => "default",
                 'color'     => "#203E78",

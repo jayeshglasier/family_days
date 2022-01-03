@@ -18,8 +18,8 @@ class VerifyApiToken
     {
         $header = $request->header('token'); // User token
 
-        if($header) 
-        {
+        if ($header) {
+            
             if(User::where('use_token',$header)->exists())
             {   
                 if(User::where('use_token',$header)->where('use_status',0)->exists())

@@ -77,7 +77,7 @@ class SendDailyRewardNotification extends Command
 
           $notification = array(
               'body' => $rewardName,
-              'title' => $rewardName.' '. $content.' - Family Days',
+              'title' => $rewardName.' '. $content.' - ChoreUp',
               'sound' => "default",
               'color' => "#203E78",
               'type' => $type,
@@ -109,7 +109,7 @@ class SendDailyRewardNotification extends Command
         {
             $notification = [
                 'date'      => date('d-m-Y H:i:s'),
-                'title'     => $rewardName.' '. $content.' - Family Days',
+                'title'     => $rewardName.' '. $content.' - ChoreUp',
                 'body'      => $rewardName,
                 'sound'     => "default",
                 'color'     => "#203E78",

@@ -73,7 +73,7 @@ class UserController extends Controller
                             $profileurl = url("public/images/user-images/user-profile.png");
                         }
 
-                         $userDetails = array("email" => $usertDetail->email, "token" => $usertDetail->token,"full_name" => $usertDetail->full_name,"role" => $usertDetail->use_role,"is_admin" => $usertDetail->use_is_admin,"profile_url" => $profileurl);
+                        $userDetails = array("email" => $usertDetail->email, "token" => $usertDetail->token,"full_name" => $usertDetail->full_name,"role" => $usertDetail->use_role,"is_admin" => $usertDetail->use_is_admin,"profile_url" => $profileurl);
 
                         $message = "Profile update successfully.";
                         return json_encode(['status' => true, 'error' => 200, 'message' => $message, 'data'=> $userDetails],JSON_UNESCAPED_SLASHES);

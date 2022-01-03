@@ -33,7 +33,7 @@ class UserRegistered extends Mailable
     {
         $address = env('MAIL_USERNAME');
         $subject = 'New register in family days';
-        $name = 'Family Days';
+        $name = 'ChoreUp';
 
         return $this->view('emails.user.registered')
         ->from($address, $name)

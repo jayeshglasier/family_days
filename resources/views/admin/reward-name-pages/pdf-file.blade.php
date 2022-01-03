@@ -7,7 +7,7 @@
 </head>
 <body>
 	<div class="page">
-		<h3 style="text-align: center;"> <?php echo (isset($companyname) && $companyname != '' ? $companyname : 'Family Days - Reward Name Record') ?></h3>
+		<h3 style="text-align: center;"> <?php echo (isset($companyname) && $companyname != '' ? $companyname : 'ChoreUp - Reward Name Record') ?></h3>
 		<hr>
 		<table style="width:100%;" border="0.4">
 			<tbody>

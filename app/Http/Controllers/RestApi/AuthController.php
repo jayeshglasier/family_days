@@ -293,10 +293,18 @@ class AuthController extends Controller
 
                         $userEmails = array();
 
+                        function validEmail($str) {
+                            return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
+                        }
+
                         foreach ($uemailRecord as $key => $value) {
                             if($value->email)
                             {
-                                $userEmails[] = $value->email;
+                                if(!validEmail($value->email)){
+                                }
+                                else{
+                                    $userEmails[] = $value->email;
+                                }
                             }
                         }
 
@@ -323,7 +331,7 @@ class AuthController extends Controller
     {
 
         $rules = [
-            'email' => 'required',
+            'email' => 'required|email',
             ];
         $validator = Validator::make($request->all(), $rules);
 
@@ -367,10 +375,18 @@ class AuthController extends Controller
 
                         $userEmails = array();
 
+                        function validEmail($str) {
+                            return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
+                        }
+
                         foreach ($uemailRecord as $key => $value) {
                             if($value->email)
                             {
-                                $userEmails[] = $value->email;
+                                if(!validEmail($value->email)){
+                                }
+                                else{
+                                    $userEmails[] = $value->email;
+                                }
                             }
                         }
 

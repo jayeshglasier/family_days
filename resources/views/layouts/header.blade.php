@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <title>{{ $systemInformation->sys_name ? $systemInformation->sys_name : 'Family Days' }}</title>
+        <title>{{ $systemInformation->sys_name ? $systemInformation->sys_name : 'ChoreUp' }}</title>
         <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.jpg') }}" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
@@ -30,7 +30,7 @@
                 </button>
 
                 <ul class="nav navbar-nav navbar-left navbar-top-links">
-                    <li><a href="#"><i class="fa fa-users" style="color: white;"></i><b style="color: white;"> {{ $systemInformation->sys_name ? $systemInformation->sys_name : 'Family Days' }}</b> </a></li>
+                    <li><a href="#"><i class="fa fa-users" style="color: white;"></i><b style="color: white;"> {{ $systemInformation->sys_name ? $systemInformation->sys_name : 'ChoreUp' }}</b> </a></li>
                 </ul>
                 <ul class="nav navbar-right navbar-top-links">
                     <li class="dropdown">

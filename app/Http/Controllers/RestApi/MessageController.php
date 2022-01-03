@@ -224,7 +224,7 @@ class MessageController extends Controller
                         {   
                             $notCount = DB::table('tbl_notifications')->join('users','tbl_notifications.not_sender_id','=','users.id')->where('not_received_id',$request['received_id'])->where('not_new_notification',0)->count('not_new_notification');
 
-                            $title = $userRecord->use_username. ' '.$notification['sendMessageContent'].' - Family Days';
+                            $title = $userRecord->use_username. ' '.$notification['sendMessageContent'].' - ChoreUp';
                             $userName = $userRecord->use_username;
                             $sendMessageType = $notification['sendMessageType'];
                             $sendMessageContent = $notification['sendMessageContent'];
