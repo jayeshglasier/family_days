@@ -14,15 +14,15 @@
   <tr>
    <td width="30%"></td>
     <td width="40%" style="background-color: white;text-align: center;padding: 25px;background-color: #eff0f0;font-size: 20px;">
-          <table border="0" cellpadding="0" cellspacing="0" width="480" >
-              <tr>
-                  <td align="center" valign="top">
-                      <a href="#">
-                        <img alt="Logo" src="{{ asset('public/images/logo/family-days-app-icon.svg')}}" width="220" height="170" style="display: block;  font-family: 'Lato', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
-                      </a>
-                  </td>
-              </tr>
-          </table>
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
+          <tr>
+              <td align="center" valign="top">
+                  <a href="#">
+                    <img alt="Logo" src="{{ asset('public/images/logo/family-days-logo.png')}}" width="200" height="150" style="display: block;  font-family: 'Lato', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+                  </a>
+              </td>
+          </tr>
+        </table>
      </td>
       <td width="30%"></td>
   </tr>

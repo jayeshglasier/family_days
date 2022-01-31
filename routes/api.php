@@ -94,7 +94,3 @@ Route::post('delete-message', 'RestApi\MessageController@destroy');
 // ****************************** END REWARD MODULE **************************************
 
 Route::post('child-assign-finished-chores','RestApi\ChildHomeController@childAssignFinishedChores');
-
-
-
-

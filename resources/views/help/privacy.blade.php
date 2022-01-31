@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Privacy Policy - ChoreUp</title>
-    <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.jpg') }}" />
+    <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.png') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
     <link href="{{ asset('public/css/bootstrap.min.css') }}" rel="stylesheet">

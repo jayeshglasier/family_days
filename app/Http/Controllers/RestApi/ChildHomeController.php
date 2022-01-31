@@ -53,7 +53,9 @@ class ChildHomeController extends Controller
                 {
                     $userRecord = DB::table('users')->select('id','use_full_name','use_image','use_total_point')->where('use_token',$header)->first();
 
-                    $choreQuery = Chores::select('cho_id','cho_title','cho_point','cho_icon','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_is_expired','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_child_id',$userRecord->id)->where('cho_status',0);
+                    $choreQuery = Chores::select('cho_id','cho_family_id','cho_title','cho_point','cho_icon','id','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_last_date')->leftjoin('users','tbl_chores_list.cho_child_id','users.id')->where('cho_child_id',$userRecord->id)->where('cho_is_daily',0)->where('cho_status',0)->where('cho_is_expired','<>','Completed');
+
+                    $dailyChores = Chores::select('cho_id','cho_family_id','cho_title','cho_point','cho_icon','id','use_full_name','cho_createby','cho_is_complete','use_is_admin','use_token','cho_is_confirmation','cho_is_daily','cho_is_createby','cho_child_id','cho_is_admin_complete','cho_set_time','cho_date','cho_last_date')->join('users','tbl_chores_list.cho_child_id','users.id')->where('cho_child_id',$userRecord->id)->where('cho_status',0)->where('cho_is_daily',1)->whereDate('cho_date',$currentDate)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
 
                     if($loadMore == 1)
                     {   
@@ -67,7 +69,7 @@ class ChildHomeController extends Controller
                             {
                                 $adminChores = $choreQuery->whereDate('cho_date', $from_date)->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->get();
                             }else{
-                                $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->where('cho_is_daily',0)->limit(500)->get()->splice(6);
+                                $adminChores = $choreQuery->orderBy(DB::raw("(DATE_FORMAT(cho_set_time,'%Y-%m-%d %H:%i:%s'))"),'ASC')->limit(500)->get()->splice(6);
                             }
                         }else
                         {
@@ -159,10 +161,72 @@ class ChildHomeController extends Controller
                             }
                         }
 
-                        array_walk_recursive($userDetails, function (&$item, $key) {
+                        $dailyChoreDetails = array();
+                        foreach ($dailyChores as $key => $value)
+                        { 
+                            $recordReward = $value->cho_last_date;
+
+                            if($value->cho_icon)
+                            {
+                                $profileurl = url("public/images/chore-icon/".$value->cho_icon);
+                            }else{
+                                $profileurl = url("public/images/chore-icon/default-icon.png");
+                            }
+
+                            if($value->cho_is_daily == 1)
+                            {
+                                $isDaily = 'Daily Chore';
+                            }else{
+                                $isDaily = '';
+                            }
+
+                            if($recordReward)
+                            {
+                                $DeferenceInDays = Carbon::parse($currentDate)->diffInDays($recordReward);
+
+                                if($value->cho_is_daily == 1)
+                                {   
+                                    if($DeferenceInDays == 0 || $DeferenceInDays == 1)
+                                    {
+                                        $leftDays = "1 day";
+                                    }else{
+                                        $leftDays = $DeferenceInDays. ' days';
+                                    }
+                                    $content = $leftDays.' left';
+                                }else{
+                                    $content = '';
+                                }
+                                
+                            }else{
+                                $content = '';
+                            }
+
+                            $dueDate = date('d-m-Y H:i', strtotime(str_replace('/', '-', $value->cho_set_time)));
+                            $dailyChoreDetails[] = array(
+                                "chore_id" => $value->cho_id,
+                                "title" => $value->cho_title,
+                                "create_by" => $value->use_full_name,
+                                "point" => $value->cho_point,
+                                "is_daily" => $isDaily,
+                                "is_complete" => $value->cho_is_complete,
+                                "is_admin_complete" => $value->cho_is_admin_complete,
+                                "is_conform" => $value->cho_is_confirmation,
+                                "is_admin" => $value->use_is_admin,
+                                "is_createby" => $value->cho_is_createby,
+                                "due_date" => $dueDate,
+                                "child_id" => $value->id,
+                                "token" => $value->use_token,
+                                "left_days" => $content,
+                                "icon_url" => $profileurl);
+                            
+                        }
+
+                        $choresMerge = array_merge($userDetails, $dailyChoreDetails);
+
+                        array_walk_recursive($choresMerge, function (&$item, $key) {
                         $item = null === $item ? '' : $item;
                         });
-                        $this->data[$key] = $userDetails;
+                        $this->data[$key] = $choresMerge;
                         $assignChores = $this->data[$key];
                         
                     }else

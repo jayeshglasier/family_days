@@ -21,7 +21,7 @@
 <table class="table" style="width: 100%;">
   <tr>
     <td width="20%"></td>
-    <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;border-top: 1px solid #d7d0d0;background-color: white;text-align: center;"><img src="{{ asset('public/images/logo/family-days-app-icon.svg')}}" style="height: 250px;" /></td>
+    <td width="60%" style="border-right: 1px solid #d7d0d0;border-left: 1px solid #d7d0d0;border-top: 1px solid #d7d0d0;background-color: white;text-align: center;"><img src="{{ asset('public/images/logo/family-days-logo.png')}}" style="height: 150px;" /></td>
     <td width="20%"></td>
   </tr>
  <tr>

@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Login - ChoreUp</title>
-    <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.jpg') }}" />
+    <link rel="icon" type="image/ico" href="{{ asset('public/images/logo/family-days-logo.png') }}" />
     <link href="{{ asset('public/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- MetisMenu CSS -->
     <link href="{{ asset('public/css/metisMenu.min.css') }}" rel="stylesheet">
